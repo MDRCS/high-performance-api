@@ -1,6 +1,8 @@
-package http_api
+package Routing
 
 import (
+	db "../Database"
+	m "../Models"
 	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
@@ -15,10 +17,10 @@ import (
 func HttpGetAllEngineers(writer http.ResponseWriter, request *http.Request) {
 
 	start := time.Now()
-	employees := GetEngineers()
+	employees := db.GetEngineers()
 	buffer, err := json.Marshal(employees)
 	HttpCheckError(err)
-	fmt.Fprintf(writer,"%s ",string(buffer))
+	fmt.Fprintf(writer,"%s",string(buffer))
 	log.Println(time.Since(start))
 }
 
@@ -26,21 +28,21 @@ func HttpGetOneEngineer(writer http.ResponseWriter,request *http.Request) {
 	start := time.Now()
 	id := mux.Vars(request)["id"]
 	empID,_ := strconv.Atoi(id)
-	employees := GetOneEngineer(empID)
+	employees := db.GetOneEngineer(empID)
 	buffer, err := json.Marshal(employees)
 	HttpCheckError(err)
-	fmt.Fprintf(writer,"%s ",string(buffer))
+	fmt.Fprintf(writer,"%s",string(buffer))
 	log.Println(time.Since(start))
 }
 
 func HttpAddEngineer(writer http.ResponseWriter,request *http.Request) {
 
 	start := time.Now()
-	new_employee := Employee{}
+	new_employee := m.Employee{}
 	record,err := ioutil.ReadAll(request.Body)
 	ValidNewRecord(err,writer)
 	json.Unmarshal(record,&new_employee)
-	Insert(new_employee)
+	db.Insert(new_employee)
 	writer.WriteHeader(http.StatusCreated)
 	json.NewEncoder(writer).Encode(new_employee)
 	log.Println(time.Since(start))
@@ -50,13 +52,13 @@ func HttpAddEngineer(writer http.ResponseWriter,request *http.Request) {
 func HttpUpdateEngineer(writer http.ResponseWriter,request *http.Request) {
 
 	start := time.Now()
-	new_employee := Employee{}
+	new_employee := m.Employee{}
 	id := mux.Vars(request)["id"]
 	empID,_ := strconv.Atoi(id)
 	record,err := ioutil.ReadAll(request.Body)
 	ValidNewRecord(err,writer)
 	json.Unmarshal(record,&new_employee)
-	Update(empID,&new_employee)
+	db.Update(empID,&new_employee)
 	writer.WriteHeader(http.StatusCreated)
 	json.NewEncoder(writer).Encode(new_employee)
 	log.Println(time.Since(start))
@@ -67,17 +69,17 @@ func HttpDeleteEngineer(writer http.ResponseWriter, request *http.Request) {
 	start := time.Now()
 	id := mux.Vars(request)["id"]
 	empID, _ := strconv.Atoi(id)
-	Delete(empID)
-	fmt.Fprintf(writer, "the deletion has been complete successfully !!! ")
+	db.Delete(empID)
+	fmt.Fprintf(writer, "the deletion has been complete successfully !!!")
 	log.Println(time.Since(start))
 }
 
 func HttpGetAllCompanies(writer http.ResponseWriter, request *http.Request) {
 	start := time.Now()
-	companies := GetCompanies()
+	companies := db.GetCompanies()
 	buffer, err := json.Marshal(companies)
 	HttpCheckError(err)
-	fmt.Fprintf(writer,"%s ",string(buffer))
+	fmt.Fprintf(writer,"%s",string(buffer))
 	log.Println(time.Since(start))
 
 }
@@ -86,7 +88,7 @@ func HttpGetOneCompany(writer http.ResponseWriter,request *http.Request) {
 
 	start := time.Now()
 	camp_name := mux.Vars(request)["name"]
-	campany := GetOneCompanyByName(camp_name)
+	campany := db.GetOneCompanyByName(camp_name)
 	buffer, err := json.Marshal(campany)
 	HttpCheckError(err)
 	fmt.Fprintf(writer,"%s",string(buffer))
@@ -96,11 +98,11 @@ func HttpGetOneCompany(writer http.ResponseWriter,request *http.Request) {
 
 func HttpAddCompany(writer http.ResponseWriter, request *http.Request) {
 	start := time.Now()
-	new_campany := Employeer{}
+	new_campany := m.Employeer{}
 	record,err := ioutil.ReadAll(request.Body)
 	ValidNewRecord(err,writer)
 	json.Unmarshal(record,&new_campany)
-	AddCompany(new_campany)
+	db.AddCompany(new_campany)
 	writer.WriteHeader(http.StatusCreated)
 	json.NewEncoder(writer).Encode(new_campany)
 	log.Println(time.Since(start))
@@ -111,8 +113,8 @@ func HttpDeleteCompany(writer http.ResponseWriter, request *http.Request) {
 	start := time.Now()
 	id := mux.Vars(request)["id"]
 	campID, _ := strconv.Atoi(id)
-	DeleteCompany(campID)
-	fmt.Fprintf(writer, "the deletion has been complete successfully !!! ")
+	db.DeleteCompany(campID)
+	fmt.Fprintf(writer, "the deletion has been complete successfully !!!")
 	log.Println(time.Since(start))
 }
 

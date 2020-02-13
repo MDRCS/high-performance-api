@@ -1,6 +1,10 @@
-package http_api
+package Database
 
-import "database/sql"
+import (
+	"database/sql"
+	c "../Credentials"
+	m "../Models"
+)
 
 func GetConn(user, password, dbname  string) sql.DB{
 	db, err := sql.Open("mysql", user+ ":"+ password+"@/"+dbname)
@@ -9,14 +13,14 @@ func GetConn(user, password, dbname  string) sql.DB{
 }
 
 
-func GetEngineers() []Employee {
+func GetEngineers() []m.Employee {
 
-	var employees []Employee
-	var emp Employee
-	var employeer Employeer
+	var employees []m.Employee
+	var emp m.Employee
+	var employeer m.Employeer
 
 	db := sql.DB{}
-	db = GetConn(Mysql_user,Mysql_password,Database_name)
+	db = GetConn(c.Mysql_user,c.Mysql_password,c.Database_name)
 	result,err := db.Query("select * from employee")
 	CheckError(err)
 
@@ -33,13 +37,13 @@ func GetEngineers() []Employee {
 	return employees
 }
 
-func GetOneEngineer(empID int) Employee {
+func GetOneEngineer(empID int) m.Employee {
 
-	var emp Employee
-	var employeer Employeer
+	var emp m.Employee
+	var employeer m.Employeer
 
 	db := sql.DB{}
-	db = GetConn(Mysql_user,Mysql_password,Database_name)
+	db = GetConn(c.Mysql_user,c.Mysql_password,c.Database_name)
 	result,err := db.Query("select * from employee where employee_id = ?",empID)
 	CheckError(err)
 
@@ -54,10 +58,10 @@ func GetOneEngineer(empID int) Employee {
 	return emp
 }
 
-func Update(emp_id int, emp *Employee) {
+func Update(emp_id int, emp *m.Employee) {
 
 	db := sql.DB{}
-	db = GetConn(Mysql_user,Mysql_password,Database_name)
+	db = GetConn(c.Mysql_user,c.Mysql_password,c.Database_name)
 	_, err := db.Query("update employee set email=? ,employeer_id=? where employee_id=?",emp.Email,emp.Employeer.ID,emp_id)
 	CheckError(err)
 	defer db.Close()
@@ -66,7 +70,7 @@ func Update(emp_id int, emp *Employee) {
 func Delete(emp_id int){
 
 	db := sql.DB{}
-	db = GetConn(Mysql_user,Mysql_password,Database_name)
+	db = GetConn(c.Mysql_user,c.Mysql_password,c.Database_name)
 	_, err := db.Query("delete from employee where employee_id =?",emp_id)
 	CheckError(err)
 	defer db.Close()
@@ -75,17 +79,17 @@ func Delete(emp_id int){
 func DeleteByCamp(camp_id int){
 
 	db := sql.DB{}
-	db = GetConn(Mysql_user,Mysql_password,Database_name)
+	db = GetConn(c.Mysql_user,c.Mysql_password,c.Database_name)
 	_, err := db.Query("delete from employee where employeer_id =?",camp_id)
 	CheckError(err)
 	defer db.Close()
 }
 
 
-func Insert(emp Employee) {
+func Insert(emp m.Employee) {
 
 	db := sql.DB{}
-	db = GetConn(Mysql_user,Mysql_password,Database_name)
+	db = GetConn(c.Mysql_user,c.Mysql_password,c.Database_name)
 	_, err := db.Query("insert into employee " +
 			"(first_name,last_name,email,gender,employeer_id) values (?,?,?,?,?)",
 			emp.Firstname,
@@ -100,9 +104,9 @@ func Insert(emp Employee) {
 }
 
 
-func AddCompany(camp Employeer) {
+func AddCompany(camp m.Employeer) {
 	db := sql.DB{}
-	db = GetConn(Mysql_user,Mysql_password,Database_name)
+	db = GetConn(c.Mysql_user,c.Mysql_password,c.Database_name)
 	_, err := db.Query("insert into employeer " +
 		"(company_name) values (?)",
 		camp.Company)
@@ -110,13 +114,13 @@ func AddCompany(camp Employeer) {
 	defer db.Close()
 }
 
-func GetCompanies() []Employeer {
+func GetCompanies() []m.Employeer {
 
-	employeer := Employeer{}
-	companies := []Employeer{}
+	employeer := m.Employeer{}
+	companies := []m.Employeer{}
 
 	db := sql.DB{}
-	db = GetConn(Mysql_user,Mysql_password,Database_name)
+	db = GetConn(c.Mysql_user,c.Mysql_password,c.Database_name)
 	result,err := db.Query("select * from employeer")
 	CheckError(err)
 	for result.Next() {
@@ -129,11 +133,11 @@ func GetCompanies() []Employeer {
 	return companies
 }
 
-func GetOneCompanyByName(name string) Employeer {
+func GetOneCompanyByName(name string) m.Employeer {
 
-	camp := Employeer{}
+	camp := m.Employeer{}
 	db := sql.DB{}
-	db = GetConn(Mysql_user,Mysql_password,Database_name)
+	db = GetConn(c.Mysql_user,c.Mysql_password,c.Database_name)
 	result,err := db.Query("select * from employeer where company_name  = ?",name)
 	CheckError(err)
 
@@ -150,7 +154,7 @@ func GetOneCompanyByName(name string) Employeer {
 func DeleteCompany(camp_id int){
 
 	db := sql.DB{}
-	db = GetConn(Mysql_user,Mysql_password,Database_name)
+	db = GetConn(c.Mysql_user,c.Mysql_password,c.Database_name)
 	DeleteByCamp(camp_id) //Cascade erasing
 	_, err := db.Query("delete from employeer where employeer_id =?",camp_id)
 	CheckError(err)

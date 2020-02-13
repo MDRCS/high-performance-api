@@ -1,4 +1,4 @@
-package http_api
+package Models
 
 type Employee struct {
 	ID              int         `gorm:"column:employee_id" json:"employee_id"`

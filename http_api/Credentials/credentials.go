@@ -1,4 +1,4 @@
-package http_api
+package Credentials
 
 const Mysql_user = "root"
 const Mysql_password = ""
